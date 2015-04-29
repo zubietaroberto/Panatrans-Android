@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="orange_500">#ff5722</color>
+    <color name="orange_700">#e64a19</color>
+
+    <color name="indigo_500">#3f51b5</color>
+
+    <color name="color_primary">@color/orange_500</color>
+    <color name="color_primary_dark">@color/orange_700</color>
+    <color name="color_accent">@color/indigo_500</color>
+
+</resources>
