@@ -1,6 +1,7 @@
 package pa.com.poroto.panatransandroid;
 
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -8,6 +9,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
@@ -36,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
 
     final private GsonConverter mConverter = new GsonConverter(new Gson());
     final private HashMap<Marker, String> mMarkerList = new HashMap<>();
+    private boolean mIsZoomedToUser = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
 
         final PanatransApi api = adapter.create(PanatransApi.class);
 
+        Toast.makeText(this, "Loading Bus Stops...", Toast.LENGTH_LONG).show();
         AndroidObservable.bindActivity(this, api.getStops())
                 .map(new Func1<Response, ArrayList<QueryStationListModel.Station>>() {
                     @Override
@@ -113,6 +117,20 @@ public class MainActivity extends AppCompatActivity {
                 intent.putExtras(bundle);
                 startActivity(intent);
                 return false;
+            }
+        });
+        map.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
+            @Override
+            public void onMyLocationChange(Location location) {
+                if (location != null && !mIsZoomedToUser) {
+                    map.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                            new LatLng(location.getLatitude(), location.getLongitude()),
+                            13
+                    ));
+
+                    //Autozoom only once
+                    mIsZoomedToUser = true;
+                }
             }
         });
     }
