@@ -5,6 +5,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.view.View;
+import android.widget.ProgressBar;
 
 import com.google.gson.Gson;
 
@@ -34,6 +36,9 @@ public class StationActivity extends AppCompatActivity {
     @InjectView(R.id.recycler_view)
     public RecyclerView mRecyclerView;
 
+    @InjectView(R.id.progress)
+    public ProgressBar mProgressBar;
+
     private RoutesRecyclerAdapter mAdapter;
 
     @Override
@@ -53,6 +58,9 @@ public class StationActivity extends AppCompatActivity {
                 .build();
 
         final PanatransApi api = adapter.create(PanatransApi.class);
+
+        mProgressBar.setVisibility(View.VISIBLE);
+        mRecyclerView.setVisibility(View.GONE);
 
         AndroidObservable
                 .bindActivity(this, api.getStopById(id))
@@ -91,6 +99,9 @@ public class StationActivity extends AppCompatActivity {
                     @Override
                     public void onNext(QueryStationModel.StationData individualStop) {
                         if (individualStop != null) {
+                            mProgressBar.setVisibility(View.GONE);
+                            mRecyclerView.setVisibility(View.VISIBLE);
+
                             StationActivity.this.setTitle(individualStop.name);
                             mAdapter.setupAdapter(individualStop.routes);
                         }
