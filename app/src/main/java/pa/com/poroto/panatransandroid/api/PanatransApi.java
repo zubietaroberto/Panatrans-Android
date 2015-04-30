@@ -2,6 +2,7 @@ package pa.com.poroto.panatransandroid.api;
 
 import retrofit.client.Response;
 import retrofit.http.GET;
+import retrofit.http.Path;
 import rx.Observable;
 
 /**
@@ -13,4 +14,7 @@ public interface PanatransApi {
 
     @GET("/stops/")
     Observable<Response> getStops();
+
+    @GET("/stops/{id}/")
+    Observable<Response> getStopById(@Path("id") String id);
 }

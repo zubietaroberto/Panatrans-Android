@@ -1,5 +1,6 @@
 package pa.com.poroto.panatransandroid;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -10,14 +11,15 @@ import android.widget.Toast;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import pa.com.poroto.panatransandroid.api.PanatransApi;
-import pa.com.poroto.panatransandroid.api.StatusModel;
-import pa.com.poroto.panatransandroid.api.StopsModel;
+import pa.com.poroto.panatransandroid.api.QueryStationListModel;
 import retrofit.RestAdapter;
 import retrofit.client.Response;
 import retrofit.converter.ConversionException;
@@ -32,8 +34,8 @@ import rx.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity {
 
-    final private Gson mGSON = new Gson();
-    final private GsonConverter mConverter = new GsonConverter(mGSON);
+    final private GsonConverter mConverter = new GsonConverter(new Gson());
+    final private HashMap<Marker, String> mMarkerList = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,13 +52,13 @@ public class MainActivity extends AppCompatActivity {
         final PanatransApi api = adapter.create(PanatransApi.class);
 
         AndroidObservable.bindActivity(this, api.getStops())
-                .map(new Func1<Response, ArrayList<StopsModel>>() {
+                .map(new Func1<Response, ArrayList<QueryStationListModel.Station>>() {
                     @Override
-                    public ArrayList<StopsModel> call(Response response) {
+                    public ArrayList<QueryStationListModel.Station> call(Response response) {
                         try {
-                            final StatusModel status = (StatusModel) mConverter.fromBody(
+                            final QueryStationListModel status = (QueryStationListModel) mConverter.fromBody(
                                     response.getBody(),
-                                    StatusModel.class);
+                                    QueryStationListModel.class);
 
                             if (status != null && TextUtils.equals(status.status, "success")) {
                                 return status.data;
@@ -68,15 +70,15 @@ public class MainActivity extends AppCompatActivity {
                         return new ArrayList<>();
                     }
                 })
-                .flatMap(new Func1<ArrayList<StopsModel>, Observable<StopsModel>>() {
+                .flatMap(new Func1<ArrayList<QueryStationListModel.Station>, Observable<QueryStationListModel.Station>>() {
                     @Override
-                    public Observable<StopsModel> call(ArrayList<StopsModel> stopsModels) {
-                        return Observable.from(stopsModels);
+                    public Observable<QueryStationListModel.Station> call(ArrayList<QueryStationListModel.Station> stations) {
+                        return Observable.from(stations);
                     }
                 })
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<StopsModel>() {
+                .subscribe(new Subscriber<QueryStationListModel.Station>() {
                     @Override
                     public void onCompleted() {
                         Toast.makeText(MainActivity.this, "Load Complete", Toast.LENGTH_LONG).show();
@@ -88,11 +90,31 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     @Override
-                    public void onNext(StopsModel stopsModel) {
-                        final LatLng position = new LatLng(stopsModel.lat, stopsModel.lon);
-                        map.addMarker(new MarkerOptions().position(position).snippet(stopsModel.name));
+                    public void onNext(QueryStationListModel.Station station) {
+                        final LatLng position = new LatLng(station.lat, station.lon);
+                        mMarkerList.put(map.addMarker(
+                                        new MarkerOptions()
+                                                .position(position)
+                                                .snippet(station.name)
+                                ),
+                                station.id
+                        );
                     }
                 });
+
+        map.setMyLocationEnabled(true);
+        map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                final Intent intent = new Intent(MainActivity.this, StationActivity.class);
+                final String station_id = mMarkerList.get(marker);
+                final Bundle bundle = new Bundle();
+                bundle.putString(StationActivity.sStation_ID, station_id);
+                intent.putExtras(bundle);
+                startActivity(intent);
+                return false;
+            }
+        });
     }
 
     @Override
