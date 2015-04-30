@@ -2,10 +2,14 @@ package pa.com.poroto.panatransandroid;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 
 import com.google.gson.Gson;
 
+import butterknife.ButterKnife;
+import butterknife.InjectView;
 import pa.com.poroto.panatransandroid.api.PanatransApi;
 import pa.com.poroto.panatransandroid.api.QueryStationModel;
 import retrofit.RestAdapter;
@@ -27,9 +31,20 @@ public class StationActivity extends AppCompatActivity {
 
     static public String sStation_ID = "pa.com.poroto.pantransandroid.stationID";
 
+    @InjectView(R.id.recycler_view)
+    public RecyclerView mRecyclerView;
+
+    private RoutesRecyclerAdapter mAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_stationdetails);
+        ButterKnife.inject(this);
+
+        mAdapter = new RoutesRecyclerAdapter();
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mRecyclerView.setAdapter(mAdapter);
 
         final String id = getIntent().getExtras().getString(sStation_ID);
 
@@ -77,6 +92,7 @@ public class StationActivity extends AppCompatActivity {
                     public void onNext(QueryStationModel.StationData individualStop) {
                         if (individualStop != null) {
                             StationActivity.this.setTitle(individualStop.name);
+                            mAdapter.setupAdapter(individualStop.routes);
                         }
                     }
                 });

@@ -14,8 +14,16 @@ public class QueryStationModel {
 
         public int id;
         public String name;
-        public String URL;
+        public double lat;
+        public double lon;
+        public List<Route> routes;
+    }
+
+    public static class Route {
         public List<Trip> trips;
+        public String name;
+        public String url;
+        public int id;
     }
 
     public static class Trip{
