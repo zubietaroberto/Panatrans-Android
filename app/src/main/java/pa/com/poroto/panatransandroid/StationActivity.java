@@ -54,8 +54,7 @@ public class StationActivity extends AppCompatActivity {
 
         final PanatransApi.PanatransApiInterface api = PanatransApi.build();
 
-        mProgressBar.setVisibility(View.VISIBLE);
-        mRecyclerView.setVisibility(View.GONE);
+        setIsProgressShown(true);
 
         AndroidObservable
                 .bindActivity(this, api.getStopById(id))
@@ -83,7 +82,9 @@ public class StationActivity extends AppCompatActivity {
                 .subscribe(new Observer<QueryStationModel.StationData>() {
                     @Override
                     public void onCompleted() {
-
+                        if (!mAdapter.mRouteList.isEmpty()){
+                            setIsProgressShown(false);
+                        }
                     }
 
                     @Override
@@ -94,9 +95,6 @@ public class StationActivity extends AppCompatActivity {
                     @Override
                     public void onNext(QueryStationModel.StationData individualStop) {
                         if (individualStop != null) {
-                            mProgressBar.setVisibility(View.GONE);
-                            mRecyclerView.setVisibility(View.VISIBLE);
-
                             StationActivity.this.setTitle(individualStop.name);
                             mAdapter.setupAdapter(individualStop.routes);
                         }
@@ -105,5 +103,15 @@ public class StationActivity extends AppCompatActivity {
 
 
 
+    }
+
+    public void setIsProgressShown(final boolean pShowProgress){
+        if (pShowProgress){
+            mProgressBar.setVisibility(View.VISIBLE);
+            mRecyclerView.setVisibility(View.GONE);
+        } else {
+            mProgressBar.setVisibility(View.GONE);
+            mRecyclerView.setVisibility(View.VISIBLE);
+        }
     }
 }
