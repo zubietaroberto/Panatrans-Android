@@ -10,15 +10,10 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.ProgressBar;
 
-import com.google.gson.Gson;
-
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import pa.com.poroto.panatransandroid.api.PanatransApi;
 import pa.com.poroto.panatransandroid.api.QueryStationModel;
-import retrofit.client.Response;
-import retrofit.converter.ConversionException;
-import retrofit.converter.GsonConverter;
 import rx.Observer;
 import rx.android.observables.AndroidObservable;
 import rx.android.schedulers.AndroidSchedulers;
@@ -29,8 +24,6 @@ import rx.schedulers.Schedulers;
  * Created by zubietaroberto on 04/29/15.
  */
 public class StationActivity extends AppCompatActivity {
-
-    final private GsonConverter mConverter = new GsonConverter(new Gson());
 
     static public String sStation_ID = "pa.com.poroto.pantransandroid.stationID";
 
@@ -60,31 +53,12 @@ public class StationActivity extends AppCompatActivity {
 
         AndroidObservable
                 .bindActivity(this, api.getStopById(id))
-                .map(new Func1<Response, QueryStationModel.StationData>() {
-                    @Override
-                    public QueryStationModel.StationData call(Response response) {
-
-                        try {
-                            final QueryStationModel status = (QueryStationModel) mConverter.fromBody(
-                                    response.getBody(),
-                                    QueryStationModel.class);
-
-                            if (status != null && TextUtils.equals(status.status, "success")) {
-                                return status.data;
-                            }
-                        } catch (ConversionException e) {
-                            e.printStackTrace();
-                        }
-
-                        return null;
-                    }
-                })
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<QueryStationModel.StationData>() {
+                .subscribe(new Observer<QueryStationModel>() {
                     @Override
                     public void onCompleted() {
-                        if (!mAdapter.mRouteList.isEmpty()){
+                        if (!mAdapter.mRouteList.isEmpty()) {
                             setIsProgressShown(false);
                         }
                     }
@@ -95,10 +69,10 @@ public class StationActivity extends AppCompatActivity {
                     }
 
                     @Override
-                    public void onNext(QueryStationModel.StationData individualStop) {
-                        if (individualStop != null) {
-                            StationActivity.this.setTitle(individualStop.name);
-                            mAdapter.setupAdapter(individualStop.routes);
+                    public void onNext(QueryStationModel station) {
+                        if (station != null && station.data != null) {
+                            StationActivity.this.setTitle(station.data.name);
+                            mAdapter.setupAdapter(station.data.routes);
                         }
                     }
                 });

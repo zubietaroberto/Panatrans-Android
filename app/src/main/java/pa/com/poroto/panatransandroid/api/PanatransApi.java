@@ -27,9 +27,9 @@ public class PanatransApi {
     public interface PanatransApiInterface {
 
         @GET("/stops/")
-        Observable<Response> getStops();
+        Observable<QueryStationListModel> getStops();
 
         @GET("/stops/{id}/")
-        Observable<Response> getStopById(@Path("id") String id);
+        Observable<QueryStationModel> getStopById(@Path("id") String id);
     }
 }
