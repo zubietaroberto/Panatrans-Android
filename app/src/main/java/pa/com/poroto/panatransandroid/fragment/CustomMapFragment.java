@@ -21,7 +21,6 @@ import java.util.HashMap;
 import pa.com.poroto.panatransandroid.StationActivity;
 import pa.com.poroto.panatransandroid.api.PanatransApi;
 import pa.com.poroto.panatransandroid.api.QueryStationListModel;
-import retrofit.RestAdapter;
 import retrofit.client.Response;
 import retrofit.converter.ConversionException;
 import retrofit.converter.GsonConverter;
@@ -46,11 +45,7 @@ public class CustomMapFragment extends MapFragment {
         super.onViewCreated(view, savedInstanceState);
         final GoogleMap map = getMap();
 
-        final RestAdapter adapter = new RestAdapter.Builder()
-                .setEndpoint(PanatransApi.sURL)
-                .build();
-
-        final PanatransApi api = adapter.create(PanatransApi.class);
+        final PanatransApi.PanatransApiInterface api = PanatransApi.build();
 
         Toast.makeText(this.getActivity(), "Loading Bus Stops...", Toast.LENGTH_LONG).show();
         AndroidObservable.bindFragment(this, api.getStops())

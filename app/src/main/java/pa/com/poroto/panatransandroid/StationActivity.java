@@ -14,7 +14,6 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import pa.com.poroto.panatransandroid.api.PanatransApi;
 import pa.com.poroto.panatransandroid.api.QueryStationModel;
-import retrofit.RestAdapter;
 import retrofit.client.Response;
 import retrofit.converter.ConversionException;
 import retrofit.converter.GsonConverter;
@@ -53,11 +52,7 @@ public class StationActivity extends AppCompatActivity {
 
         final String id = getIntent().getExtras().getString(sStation_ID);
 
-        final RestAdapter adapter = new RestAdapter.Builder()
-                .setEndpoint(PanatransApi.sURL)
-                .build();
-
-        final PanatransApi api = adapter.create(PanatransApi.class);
+        final PanatransApi.PanatransApiInterface api = PanatransApi.build();
 
         mProgressBar.setVisibility(View.VISIBLE);
         mRecyclerView.setVisibility(View.GONE);
