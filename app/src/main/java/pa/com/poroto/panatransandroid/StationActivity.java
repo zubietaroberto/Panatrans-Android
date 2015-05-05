@@ -40,23 +40,38 @@ public class StationActivity extends AppCompatActivity {
         setContentView(R.layout.activity_stationdetails);
         ButterKnife.inject(this);
 
+        // Setup Recycler View
         mAdapter = new RoutesRecyclerAdapter();
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setAdapter(mAdapter);
 
-        final String id = getIntent().getExtras().getString(sStation_ID);
+        setupData(getIntent().getExtras().getString(sStation_ID));
 
+    }
+
+    private void setupData(String pID){
+
+        //Get API Object
         final PanatransApi.PanatransApiInterface api = PanatransApi.build();
 
+        //UI feedback
         setIsProgressShown(true);
 
         AndroidObservable
-                .bindActivity(this, api.getStopById(id))
+
+                //Request Data
+                .bindActivity(this, api.getStopById(pID))
+
+                //Setup Threads
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
+
+                //Subscribe
                 .subscribe(new Observer<QueryStationModel>() {
                     @Override
                     public void onCompleted() {
+
+                        //UI Feedback
                         if (mAdapter.getItemCount() > 0) {
                             setIsProgressShown(false);
                         }
@@ -69,14 +84,14 @@ public class StationActivity extends AppCompatActivity {
 
                     @Override
                     public void onNext(QueryStationModel station) {
+
+                        //Add Route to Adapter
                         if (station != null && station.data != null) {
                             StationActivity.this.setTitle(station.data.name);
                             mAdapter.setupAdapter(station.data.routes);
                         }
                     }
                 });
-
-
 
     }
 
