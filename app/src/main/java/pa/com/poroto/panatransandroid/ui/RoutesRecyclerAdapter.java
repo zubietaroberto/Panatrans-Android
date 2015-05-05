@@ -1,4 +1,4 @@
-package pa.com.poroto.panatransandroid;
+package pa.com.poroto.panatransandroid.ui;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -15,7 +15,7 @@ import pa.com.poroto.panatransandroid.api.QueryStationModel;
  */
 public class RoutesRecyclerAdapter extends RecyclerView.Adapter<RoutesRecyclerAdapter.RouteHolder> {
 
-    final ArrayList<QueryStationModel.Route> mRouteList = new ArrayList<>();
+    private final ArrayList<QueryStationModel.Route> mRouteList = new ArrayList<>();
 
     @Override
     public RouteHolder onCreateViewHolder(ViewGroup parent, int viewType) {

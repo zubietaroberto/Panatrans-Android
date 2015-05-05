@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
 import android.view.View;
 import android.widget.ProgressBar;
 
@@ -14,10 +13,10 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import pa.com.poroto.panatransandroid.api.PanatransApi;
 import pa.com.poroto.panatransandroid.api.QueryStationModel;
+import pa.com.poroto.panatransandroid.ui.RoutesRecyclerAdapter;
 import rx.Observer;
 import rx.android.observables.AndroidObservable;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 /**
@@ -58,7 +57,7 @@ public class StationActivity extends AppCompatActivity {
                 .subscribe(new Observer<QueryStationModel>() {
                     @Override
                     public void onCompleted() {
-                        if (!mAdapter.mRouteList.isEmpty()) {
+                        if (mAdapter.getItemCount() > 0) {
                             setIsProgressShown(false);
                         }
                     }
