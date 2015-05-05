@@ -103,11 +103,7 @@ public class CustomMapFragment extends MapFragment {
         map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                final Intent intent = new Intent(getActivity(), StationActivity.class);
-                final String station_id = mMarkerList.get(marker);
-                final Bundle bundle = new Bundle();
-                bundle.putString(StationActivity.sStation_ID, station_id);
-                intent.putExtras(bundle);
+                final Intent intent = StationActivity.launchMe(mMarkerList.get(marker), getActivity());
                 startActivity(intent);
                 return false;
             }

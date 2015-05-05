@@ -1,5 +1,7 @@
 package pa.com.poroto.panatransandroid;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -113,5 +115,13 @@ public class StationActivity extends AppCompatActivity {
             mProgressBar.setVisibility(View.GONE);
             mRecyclerView.setVisibility(View.VISIBLE);
         }
+    }
+
+    public static Intent launchMe(final String pStationID, final Context pContext){
+        final Intent intent = new Intent(pContext, StationActivity.class);
+        final Bundle bundle = new Bundle();
+        bundle.putString(StationActivity.sStation_ID, pStationID);
+        intent.putExtras(bundle);
+        return intent;
     }
 }
