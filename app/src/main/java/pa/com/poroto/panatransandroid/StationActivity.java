@@ -9,8 +9,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ProgressBar;
 
+import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 import pa.com.poroto.panatransandroid.api.PanatransApi;
 import pa.com.poroto.panatransandroid.api.QueryStationModel;
 import pa.com.poroto.panatransandroid.ui.RoutesRecyclerAdapter;
@@ -26,10 +26,10 @@ public class StationActivity extends AppCompatActivity {
 
     static public String sStation_ID = "pa.com.poroto.pantransandroid.stationID";
 
-    @InjectView(R.id.recycler_view)
+    @Bind(R.id.recycler_view)
     public RecyclerView mRecyclerView;
 
-    @InjectView(R.id.progress)
+    @Bind(R.id.progress)
     public ProgressBar mProgressBar;
 
     private RoutesRecyclerAdapter mAdapter;
@@ -38,7 +38,7 @@ public class StationActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stationdetails);
-        ButterKnife.inject(this);
+        ButterKnife.bind(this);
 
         // Setup Recycler View
         mAdapter = new RoutesRecyclerAdapter();
