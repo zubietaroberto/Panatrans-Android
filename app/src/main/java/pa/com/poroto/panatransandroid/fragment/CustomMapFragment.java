@@ -1,8 +1,13 @@
 package pa.com.poroto.panatransandroid.fragment;
 
+import android.content.Context;
 import android.content.Intent;
+import android.location.Criteria;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
@@ -11,6 +16,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -36,17 +42,20 @@ public class CustomMapFragment extends SupportMapFragment implements LoaderManag
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mGoogleMap = getMap();
-        setupMap();
-    }
+        // Load Map Asynchronously
+        getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(GoogleMap googleMap) {
 
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+                //Build the map
+                mGoogleMap = googleMap;
+                setupMap();
 
-        // Start Loading
-        Toast.makeText(this.getActivity(), "Loading Bus Stops...", Toast.LENGTH_LONG).show();
-        getLoaderManager().initLoader(0, null, this);
+                // Load data
+                Toast.makeText(getActivity(), "Loading Bus Stops...", Toast.LENGTH_LONG).show();
+                getLoaderManager().initLoader(0, null, CustomMapFragment.this);
+            }
+        });
     }
 
     /*
@@ -60,7 +69,7 @@ public class CustomMapFragment extends SupportMapFragment implements LoaderManag
     @Override
     public void onLoadFinished(Loader<List<QueryStationListModel.Station>> loader, @Nullable List<QueryStationListModel.Station> data) {
 
-        // An error occured
+        // An error occurred
         if (data == null){
             Toast.makeText(getActivity(), "Error", Toast.LENGTH_LONG).show();
             return;
@@ -118,20 +127,46 @@ public class CustomMapFragment extends SupportMapFragment implements LoaderManag
                 return false;
             }
         });
-        mGoogleMap.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
-            @Override
-            public void onMyLocationChange(Location location) {
-                if (location != null && !mIsZoomedToUser) {
-                    mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
-                            new LatLng(location.getLatitude(), location.getLongitude()),
-                            13
-                    ));
 
-                    //Autozoom only once
-                    mIsZoomedToUser = true;
-                }
+        // Get the LocationManagerService
+        final LocationManager locationManager =
+                (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+
+        // Ask for a single update for a single zoom
+        locationManager.requestSingleUpdate(new Criteria(), new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                setLocation(location);
             }
-        });
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+                // Do Nothing
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+                // Do Nothing
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+                // Do Nothing
+            }
+        }, Looper.getMainLooper());
+
+    }
+
+    private void setLocation(@Nullable final Location location) {
+        if (location != null && !mIsZoomedToUser){
+            mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                    new LatLng(location.getLatitude(), location.getLongitude()),
+                    13
+            ));
+
+            //Autozoom only once
+            mIsZoomedToUser = true;
+        }
 
     }
 }
