@@ -15,7 +15,6 @@ import pa.com.poroto.panatransandroid.api.PanatransApi;
 import pa.com.poroto.panatransandroid.api.QueryStationModel;
 import pa.com.poroto.panatransandroid.ui.RoutesRecyclerAdapter;
 import rx.Observer;
-import rx.android.observables.AndroidObservable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
@@ -57,10 +56,8 @@ public class StationActivity extends AppCompatActivity {
         //UI feedback
         setIsProgressShown(true);
 
-        AndroidObservable
-
                 //Request Data
-                .bindActivity(this, api.getStopById(pID))
+        api.getStopById(pID)
 
                 //Setup Threads
                 .subscribeOn(Schedulers.newThread())

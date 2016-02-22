@@ -20,7 +20,6 @@ import pa.com.poroto.panatransandroid.api.PanatransApi;
 import pa.com.poroto.panatransandroid.api.QueryStationListModel;
 import rx.Observable;
 import rx.Subscriber;
-import rx.android.observables.AndroidObservable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
@@ -50,10 +49,8 @@ public class CustomMapFragment extends MapFragment {
         //Get the API object
         final PanatransApi.PanatransApiInterface api = PanatransApi.build();
 
-        AndroidObservable
-
-                //Start Request
-                .bindFragment(this, api.getStops())
+        //Start Request
+        api.getStops()
 
                 //Get individual stations
                 .flatMap(new Func1<QueryStationListModel, Observable<QueryStationListModel.Station>>() {
