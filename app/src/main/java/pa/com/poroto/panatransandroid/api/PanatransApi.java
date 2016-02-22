@@ -1,9 +1,10 @@
 package pa.com.poroto.panatransandroid.api;
 
-import retrofit.RestAdapter;
-import retrofit.client.Response;
-import retrofit.http.GET;
-import retrofit.http.Path;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.http.GET;
+import retrofit2.http.Path;
 import rx.Observable;
 
 /**
@@ -14,8 +15,10 @@ public class PanatransApi {
     public static final String sURL = "http://test-panatrans.herokuapp.com/v1/";
 
     public static PanatransApiInterface build(){
-        final RestAdapter adapter = new RestAdapter.Builder()
-                .setEndpoint(PanatransApi.sURL)
+        final Retrofit adapter = new Retrofit.Builder()
+                .baseUrl(PanatransApi.sURL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .build();
 
         return adapter.create(PanatransApi.PanatransApiInterface.class);
