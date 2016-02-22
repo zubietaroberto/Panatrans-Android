@@ -45,7 +45,7 @@ public class CustomMapFragment extends MapFragment {
         setupMap();
     }
 
-    private void setupData(){
+    private void setupData() {
 
         //Get the API object
         final PanatransApi.PanatransApiInterface api = PanatransApi.build();
@@ -100,8 +100,7 @@ public class CustomMapFragment extends MapFragment {
 
     }
 
-    final void setupMap(){
-
+    final void setupMap() {
         mGoogleMap.setMyLocationEnabled(true);
         mGoogleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override

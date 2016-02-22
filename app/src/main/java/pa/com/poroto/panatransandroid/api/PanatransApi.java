@@ -11,7 +11,7 @@ import rx.Observable;
  */
 public class PanatransApi {
 
-    public static final String sURL = "http://test-panatrans.herokuapp.com/v1";
+    public static final String sURL = "http://test-panatrans.herokuapp.com/v1/";
 
     public static PanatransApiInterface build(){
         final RestAdapter adapter = new RestAdapter.Builder()
@@ -26,10 +26,10 @@ public class PanatransApi {
      */
     public interface PanatransApiInterface {
 
-        @GET("/stops/")
+        @GET("stops/")
         Observable<QueryStationListModel> getStops();
 
-        @GET("/stops/{id}/")
+        @GET("stops/{id}/")
         Observable<QueryStationModel> getStopById(@Path("id") String id);
     }
 }
