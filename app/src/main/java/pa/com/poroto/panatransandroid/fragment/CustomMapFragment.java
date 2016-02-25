@@ -1,7 +1,9 @@
 package pa.com.poroto.panatransandroid.fragment;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -9,6 +11,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Looper;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.view.View;
@@ -118,7 +121,6 @@ public class CustomMapFragment extends SupportMapFragment implements LoaderManag
     }
 
     final void setupMap() {
-        mGoogleMap.setMyLocationEnabled(true);
         mGoogleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
@@ -132,35 +134,49 @@ public class CustomMapFragment extends SupportMapFragment implements LoaderManag
         final LocationManager locationManager =
                 (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
 
-        // Ask for a single update for a single zoom
-        locationManager.requestSingleUpdate(new Criteria(), new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-                setLocation(location);
-            }
+        // Enable Location Tracking ONLY if the user has allowed it (API 23 and upwards)
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED
+                || ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED)
+        {
+            mGoogleMap.setMyLocationEnabled(true);
 
-            @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-                // Do Nothing
-            }
+            // Ask for a single update for a single zoom
+            locationManager.requestSingleUpdate(new Criteria(), new LocationListener() {
+                @Override
+                public void onLocationChanged(Location location) {
+                    setLocation(new LatLng(location.getLatitude(), location.getLongitude()));
+                }
 
-            @Override
-            public void onProviderEnabled(String provider) {
-                // Do Nothing
-            }
+                @Override
+                public void onStatusChanged(String provider, int status, Bundle extras) {
+                    // Do Nothing
+                }
 
-            @Override
-            public void onProviderDisabled(String provider) {
-                // Do Nothing
-            }
-        }, Looper.getMainLooper());
+                @Override
+                public void onProviderEnabled(String provider) {
+                    // Do Nothing
+                }
+
+                @Override
+                public void onProviderDisabled(String provider) {
+                    // Do Nothing
+                }
+            }, Looper.getMainLooper());
+
+        } else {
+
+            //Default location, if the user has denied permissions
+            setLocation(new LatLng(8.9880881,-79.5104721));
+        }
 
     }
 
-    private void setLocation(@Nullable final Location location) {
+    private void setLocation(@Nullable final LatLng location) {
         if (location != null && !mIsZoomedToUser){
             mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
-                    new LatLng(location.getLatitude(), location.getLongitude()),
+                    new LatLng(location.latitude, location.longitude),
                     13
             ));
 
